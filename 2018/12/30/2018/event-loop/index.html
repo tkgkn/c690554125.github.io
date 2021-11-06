@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>事件循环 | Tkgkn</title>
+  <meta name="description" content="为什么会有事件循环Event Loop?因为JS是单线程的（执行JS代码的只有1个线程，通常会说主线程）。一个线程，执行过多任务或者任务过复杂，就会出现阻塞，因此有些如ajax耗时函数则交由其他线程处理，一旦有结果则会将为其事件条件满足设置的回调函数加入到任务队列中，EventLoop是一个机制，当当前执行栈清空后，则从任务队列中查询任务，拉出来执行，重复执行该过程。 图形话EventLoop图片">
+<meta property="og:type" content="article">
+<meta property="og:title" content="事件循环">
+<meta property="og:url" content="https://690554125.github.io/2018/12/30/2018/event-loop/index.html">
+<meta property="og:site_name" content="三角猫">
+<meta property="og:description" content="为什么会有事件循环Event Loop?因为JS是单线程的（执行JS代码的只有1个线程，通常会说主线程）。一个线程，执行过多任务或者任务过复杂，就会出现阻塞，因此有些如ajax耗时函数则交由其他线程处理，一旦有结果则会将为其事件条件满足设置的回调函数加入到任务队列中，EventLoop是一个机制，当当前执行栈清空后，则从任务队列中查询任务，拉出来执行，重复执行该过程。 图形话EventLoop图片">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://690554125.github.io/images/eventloop.jpg">
+<meta property="og:image" content="https://690554125.github.io/images/micro_and_macro.jpg">
+<meta property="article:published_time" content="2018-12-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-06T07:22:42.994Z">
+<meta property="article:author" content="czm">
+<meta property="article:tag" content="Javascript React Vue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://690554125.github.io/images/eventloop.jpg">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://690554125.github.io/2018/12/30/2018/event-loop/index.html">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="三角猫" type="application/atom+xml">
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/c690554125" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Tkgkn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">FrontEnd</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> 杭州</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      
+
+    
+      
+
+    
+      
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-2018/event-loop" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      事件循环
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/12/30/2018/event-loop/" class="article-date">
+	  <time datetime="2018-12-29T16:00:00.000Z" itemprop="datePublished">2018-12-30</time>
+	</a>
+</span>
+        
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/12/30/2018/event-loop/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="为什么会有事件循环Event-Loop"><a href="#为什么会有事件循环Event-Loop" class="headerlink" title="为什么会有事件循环Event Loop?"></a>为什么会有事件循环Event Loop?</h2><p>因为JS是单线程的（执行JS代码的只有1个线程，通常会说主线程）。一个线程，执行过多任务或者任务过复杂，就会出现阻塞，因此有些如ajax耗时函数则交由其他线程处理，一旦有结果则会将为其事件条件满足设置的回调函数加入到任务队列中，EventLoop是一个机制，当当前执行栈清空后，则从任务队列中查询任务，拉出来执行，重复执行该过程。</p>
+<h2 id="图形话EventLoop"><a href="#图形话EventLoop" class="headerlink" title="图形话EventLoop"></a>图形话EventLoop</h2><p>图片摘自掘金作者【奉献】的事件循环文章</p>
+<p><img src="/images/eventloop.jpg" alt="eventloop"></p>
+<p>图中有2个新的概念<strong>Macrotask</strong>和<strong>Microtask</strong></p>
+<h2 id="Macrotask"><a href="#Macrotask" class="headerlink" title="Macrotask"></a>Macrotask</h2><p>通常所说的任务队列，也就是Task。在ES6提出Promise之前，应该只有Task这个队列，后来规范规定清楚了2种队列，Task就成了Macrotask，也叫宏任务队列。满足条件的事件，则进入该队列，如定时器函数（setTimeout, setInterval, setImmediate等），ajax回调函数，UI交互事件（click等）</p>
+<h2 id="Microtask"><a href="#Microtask" class="headerlink" title="Microtask"></a>Microtask</h2><p>微任务队列，也叫Job，粒度比Task小。存放Promise.nextTick，Promise.then()之流的任务。</p>
+<h2 id="两个队列的优先级和插入执行时机"><a href="#两个队列的优先级和插入执行时机" class="headerlink" title="两个队列的优先级和插入执行时机"></a>两个队列的优先级和插入执行时机</h2><p>微任务处理优先于宏任务处理。只有处理完清空了微任务队列，EventLoop才会从Macrotask取一个宏任务进行处理。微任务会插入到下个Tick之前执行</p>
+<h2 id="事件循环的一轮怎么界定？"><a href="#事件循环的一轮怎么界定？" class="headerlink" title="事件循环的一轮怎么界定？"></a>事件循环的一轮怎么界定？</h2><p>这个问题困扰我比较久，查了很多资料，从【这波能反杀】作者写的事件循环机制中找到了明显的答案，结合参考了其他多篇事件循环不错的博文，如掘金的【王下邀月熊】和【奉献】2位作者的文章。</p>
+<p><strong>事件循环</strong>的开始：JS全局代码（算宏任务）入栈。</p>
+<p><strong>事件循环</strong>的结束：全局代码执行完，检查Micro是否有微任务，如果有，将微任务队列中函数放入执行栈依次执行完。清空微任务队列。至此第一轮事件循环结束。第二轮，即从下一个Macro任务开始，如此循环。<br>图片摘自掘金【王下邀月熊】的事件循环文章<br><img src="/images/micro_and_macro.jpg" alt="micro and macro"></p>
+<h2 id="代码上理解"><a href="#代码上理解" class="headerlink" title="代码上理解"></a>代码上理解</h2><blockquote>
+<p>纯文字解释不容易理解，结合代码</p>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> beginEventFlag = <span class="string">&#x27;开始事件循环&#x27;</span>; </span><br><span class="line"><span class="built_in">console</span>.log(beginEventFlag);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123; <span class="comment">// 异步</span></span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;500s执行&#x27;</span>)</span><br><span class="line">&#125;,<span class="number">500</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>)</span>&#123;</span><br><span class="line">  resolve(<span class="number">5</span>);</span><br><span class="line">&#125;)</span><br><span class="line">p.then(<span class="function"><span class="keyword">function</span>(<span class="params">r</span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(r);</span><br><span class="line">  <span class="keyword">var</span> p2 = <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function"><span class="keyword">function</span>(<span class="params">resolve, reject</span>)</span>&#123;</span><br><span class="line">    resolve(<span class="string">&#x27;又是5&#x27;</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  p2.then(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(d)</span><br><span class="line">  &#125;)     </span><br><span class="line">  <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;又是500s执行&#x27;</span>)     </span><br><span class="line">  &#125;,<span class="number">1000</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>Chrome中打印结果为：’开始时间循环’，5，又是5，500s执行，又是500s执行。</p>
+<p>结合概念中来分析此段代码：</p>
+<ol>
+<li>全局代码（同步函数，宏任务）入栈，打印‘开始事件循环’。</li>
+<li>遇到setTimeout（第一个），计时交由浏览器对应的定时器线程，并将其回调塞入宏任务队列中。</li>
+<li>执行new Promise代码，立刻决议这个p。并将其p.then放入微任务队列中。</li>
+<li>没有其他同步代码了，检查微任务队列，执行，打印‘5’。遇到p2，立刻决议，将p2.then塞入微任务队列。遇到setTimeout（第二个），塞入宏任务队列。</li>
+<li>继续检查微任务队列，发现刚塞入微任务队列的p2.then，执行，打印‘又是5’。至此微任务队列清空完毕。</li>
+<li>下一轮事件循环开始，宏任务队列中第一个setTimeout的回调执行，打印‘500s执行’。</li>
+<li>检查微任务队列，没有Job需要执行。</li>
+<li>再下一轮事件循环开始，宏任务队列中的第二个setTiemout的回调执行，打印‘又是500s执行’。</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文参考了很多博文，简化不少东西，笔者主要是为了记录并方便自己的理解，如果有问题，欢迎指正。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://690554125.github.io/2018/12/30/2018/event-loop/" title="事件循环" target="_blank" rel="external">https://690554125.github.io/2018/12/30/2018/event-loop/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/c690554125" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/c690554125" target="_blank"><span class="text-dark">Tkgkn</span><small class="ml-1x">FrontEnd</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/12/30/2018/async-sync/" title="异步和同步"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2018/12/30/2018/less-module-in-webpack/" title="webpack中的less引入"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

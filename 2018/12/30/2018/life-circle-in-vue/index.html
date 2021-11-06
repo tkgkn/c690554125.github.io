@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Vue的钩子 | Tkgkn</title>
+  <meta name="description" content="单页面应用通常都会用到vue-router，在一个组件或者页面被展示或销毁时，生命周期钩子和路由守卫协作搭配，能够时刻控制组件和页面在不同阶段触发我们自己的函数。然而，分清楚生命周期和路由守卫各自的使用场景很重要，不能混为一谈。未区分清楚，就容易犯错，如下场景案例，都是我犯错的真实案例。 错误案例如下实际工作中用错的案例。 错用场景1A页面(组件)中打开了A-1页面(组件)，然后由A-1页面返回到">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue的钩子">
+<meta property="og:url" content="https://690554125.github.io/2018/12/30/2018/life-circle-in-vue/index.html">
+<meta property="og:site_name" content="三角猫">
+<meta property="og:description" content="单页面应用通常都会用到vue-router，在一个组件或者页面被展示或销毁时，生命周期钩子和路由守卫协作搭配，能够时刻控制组件和页面在不同阶段触发我们自己的函数。然而，分清楚生命周期和路由守卫各自的使用场景很重要，不能混为一谈。未区分清楚，就容易犯错，如下场景案例，都是我犯错的真实案例。 错误案例如下实际工作中用错的案例。 错用场景1A页面(组件)中打开了A-1页面(组件)，然后由A-1页面返回到">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-12-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-06T07:21:56.570Z">
+<meta property="article:author" content="czm">
+<meta property="article:tag" content="Javascript React Vue">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://690554125.github.io/2018/12/30/2018/life-circle-in-vue/index.html">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="三角猫" type="application/atom+xml">
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/c690554125" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Tkgkn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">FrontEnd</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> 杭州</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      
+
+    
+      
+
+    
+      
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-2018/life-circle-in-vue" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Vue的钩子
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2018/12/30/2018/life-circle-in-vue/" class="article-date">
+	  <time datetime="2018-12-29T16:00:00.000Z" itemprop="datePublished">2018-12-30</time>
+	</a>
+</span>
+        
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/12/30/2018/life-circle-in-vue/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>单页面应用通常都会用到vue-router，在一个组件或者页面被展示或销毁时，生命周期钩子和路由守卫协作搭配，能够时刻控制组件和页面在不同阶段触发我们自己的函数。然而，分清楚生命周期和路由守卫各自的使用场景很重要，不能混为一谈。未区分清楚，就容易犯错，如下场景案例，都是我犯错的真实案例。</p>
+<h2 id="错误案例"><a href="#错误案例" class="headerlink" title="错误案例"></a>错误案例</h2><p>如下实际工作中用错的案例。</p>
+<h3 id="错用场景1"><a href="#错用场景1" class="headerlink" title="错用场景1"></a>错用场景1</h3><p>A页面(组件)中打开了A-1页面(组件)，然后由A-1页面返回到A页面，在A页面的<code>activated</code>钩子中写了函数，期待能够在A-1返回至A时触发，事实是没有触发，因为没有弄清楚<code>activated</code>钩子函数的触发场景，这里实际应该用路由守卫来触发。</p>
+<h3 id="错用场景2"><a href="#错用场景2" class="headerlink" title="错用场景2"></a>错用场景2</h3><p>Home页面中打开A页面，A页面返回Home页面。<br>Home页面中打开B页面，B页面返回Home页面。<br>以上操作，需要在进入A,B页面时根据页面更改title为A或B，均需要在返回Home页面时，在把title改为home。我在Home，A，B三个组件中写了<code>beforeRouteEnter</code>守卫，挂载了修改title的函数。然后只有A，B有效，Home只有在初次进入时有效。没有弄清楚操作行为B-&gt;Home，A-&gt;Home不属于<code>beforeRouteEnter</code>，路由变化是这样的: <code>/home/A</code>-&gt;<code>/home</code>。<br>解决方式：Home组件中使用<code>beforeRouteUpdate</code>，判断<code>to.path === &#39;/home&#39;</code>触发修改title。A,B组件中使用<code>beforeRouteLeave</code>判断<code>to.path === &#39;/home&#39;</code>触发修改title。或者在<code>beforeEach</code>中对路由的各个操作做判断。</p>
+<h2 id="生命周期钩子"><a href="#生命周期钩子" class="headerlink" title="生命周期钩子"></a>生命周期钩子</h2><p>生命周期钩子是比较常用的，不管是在根实例还是在单文件组件中。都经常会用到。</p>
+<h3 id="写法注意"><a href="#写法注意" class="headerlink" title="写法注意"></a>写法注意</h3><p>所有钩子函数，自动绑定this（实例本身）。所以不能使用箭头函数，箭头函数绑定的this是父作用域。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注意，这里是最简单的引用vue.js后，然后直接在全局实例化Vue</span></span><br><span class="line"><span class="comment">// 因此var vm 等同于window.vm</span></span><br><span class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  <span class="comment">// right</span></span><br><span class="line">  <span class="function"><span class="title">created</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 上面写法等同于如下写法</span></span><br><span class="line">  <span class="attr">created</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// this指向Vue实例本身</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// error 这种写法错误</span></span><br><span class="line">  <span class="attr">created</span>: <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 箭头函数绑定的是父作用域，这个例子中this指向window</span></span><br><span class="line">    <span class="comment">// 因此箭头函数的话this指向并不是你期待的</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="生命周期函数"><a href="#生命周期函数" class="headerlink" title="生命周期函数"></a>生命周期函数</h3><p><strong>beforeCreate</strong>：实例初始化之后，实例还没有创建完成，因此访问this的话，是undefined。</p>
+<p><strong>created</strong>：实例创建完成，但是未完成DOM挂载。因此this.$el是访问不到的。这里可以执行watch，methods等方法了。常用来挂载页面数据初始化（不涉及到DOM操作）。</p>
+<blockquote>
+<p>涉及到dom挂载，挂载后的重新打补丁渲染，销毁等钩子，都不会在服务端渲染阶段被调用。可以理解，因为服务端只会对页面做一次初始化，按照初始渲染，生成HTML，发送到客户端（浏览器端）。这块猜测如此，后期学习ssr方式后验证。</p>
+</blockquote>
+<p><strong>beforeMount</strong>：在挂载DOM到之前的一个钩子函数。能访问到this.$el，就是需要挂载的元素DOM（原始模板）。<strong>注意</strong>：$el即挂载的根节点，如<code>&lt;div id=&quot;app&quot;&gt;&lt;/div&gt;</code>，如单文件组件<code>&lt;template&gt;&lt;div&gt;&lt;/div&gt;&lt;/template&gt;</code>中的div根节点。如果是单文件的方式，在组建中beforeMount不一定能获取到$el，官方文档在<strong>mounted</strong>钩子函数中有说明。</p>
+<blockquote>
+<p>注意 mounted 不会承诺所有的子组件也都一起被挂载。如果你希望等到整个视图都渲染完毕，可以用 vm.$nextTick 替换掉 mounted。</p>
+</blockquote>
+<p><strong>mounted</strong>：el选项被新创建的$el替换，且$el挂载到实例上之后（即vm.$el），调用该钩子。通常会在该钩子阶段，操作DOM。这里可以访问到ref标记的DOM结构。</p>
+<p><strong>beforeUpdate</strong>：数据发生变化时，在虚拟DOM打补丁之前调用。可以访问数据更新前那个状态下的DOM。</p>
+<p><strong>updated</strong>：数据发生变化且虚拟DOM补丁打完之后。DOM更新成功，可以执行一些依赖DOM的操作。不应该在该钩子重新更改状态，考虑用watch和computed。类似mounted，不保证所有组件都重绘完成。如果需要确认所有组件重绘完成，使用$nextTick。</p>
+<p><strong>beforeDestroy</strong>：实例销毁之前调用。实例销毁，如v-if，vue-router中切换视图等都会触发该钩子。</p>
+<p><strong>destroyed</strong>：实例销毁之后调用，完全销毁，包括子实例也会销毁，同触发该钩子函数。</p>
+<p><strong>activated</strong>：组件相关的钩子，只有keep-alive包裹的组件，重新激活时会触发。通常我们会在<code>&lt;router-view&gt;&lt;/router-view&gt;</code>外套一层<code>&lt;keep-alive&gt;&lt;/keep-alive&gt;</code>，单页面应用，频繁切换视图，减小重新渲染开销。如果使用了keep-alice，会触发<code>activated</code>钩子，但是由于组件被缓存在内存中，没有销毁，也没有重新创建，因此从第二次渲染同样组件时不会触发<code>beforeCreate</code>,<code>created</code>,<code>beforeMount</code>,<code>mounted</code>等钩子，这点应该很好理解。而<code>beforeDestroy</code>,<code>destroyed</code>则永远不会被触发。</p>
+<p><strong>deactivated</strong>：组件相关的钩子，只有keep-alive包裹的组件，被停用时触发，类似于destroyed，但是不是真的销毁，而是存到内存放到一边，暂时不用这个组件，keep-alive形式的组件切换会触发该钩子。</p>
+<h2 id="路由守卫"><a href="#路由守卫" class="headerlink" title="路由守卫"></a>路由守卫</h2><p>分为3种类型守卫：全局型，单个路由独享型，组件内调用型。<br>通常回调函数有3个参数to, from, next。to，from均为对象，存放路由跳转目的地的参数和来源地的参数，而next为函数，类似于管道操作，进入到下一个钩子，不执行的话，通常会导致路由中断。</p>
+<h2 id="全局型"><a href="#全局型" class="headerlink" title="全局型"></a>全局型</h2><h3 id="beforeEach"><a href="#beforeEach" class="headerlink" title="beforeEach"></a>beforeEach</h3><p>全局前置路由。进入某路由之前触发。</p>
+<h3 id="beforeResolve"><a href="#beforeResolve" class="headerlink" title="beforeResolve"></a>beforeResolve</h3><p>全局解析路由。导航确认之前，同时在所有组件内调用型路由守卫和异步路由组件被解析之后，该解析守卫就会被调用。这里涉及的执行条件需要理解的是，1是<code>导航确认之前</code>，导航的确认是指全部的钩子执行完，导航状态就是确认的(confirmed状态)。2是<code>组件内路由守卫和异步路由组件都被解析</code>，指的是路由内调用型的3个守卫<code>beforeRouteEnter, beforeRouteUpdate, beforeRouteLeave</code>，异步路由组件解析后(懒加载，通过Import()函数或require方式，用到的时候会去加载再解析，没用到就不存在加载解析一说)。简单来说，等组件内调用型守卫执行完了，异步组件也加载完了，才会执行<code>beforeResolve</code>。</p>
+<h3 id="afterEach"><a href="#afterEach" class="headerlink" title="afterEach"></a>afterEach</h3><p>全局后置钩子。没有next参数，可以理解，毕竟都已经后置了。在路由操作流程的最后触发。需要注意的是，这个钩子看起来是最后一个执行的钩子没错，但是在组件内调用守卫<code>beforeRouteEnter</code>的参数<code>next</code>中的回调函数，才是最后执行的，此时实例已创建好，所以可以在回调中访问到vue实例！！！</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> router = <span class="keyword">new</span> VueRouter(&#123;</span><br><span class="line">  <span class="attr">routes</span>: []</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;我是老大，第一个执行&#x27;</span>)</span><br><span class="line">  next();</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">router.beforeResolve(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;我是保姆，大家都加载好，我在加载&#x27;</span>)</span><br><span class="line">  next();</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">router.afterEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&#x27;我是看起来的最后一名，不过好像有一个哥们比我还靠后，这哥们是beforeRouteEnter的回调参数next&#x27;</span>)</span><br><span class="line">  next();</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>没有路由地址的情况下，上述3个全局路由会被各自执行一遍！。</p>
+<h2 id="单个路由独享守卫"><a href="#单个路由独享守卫" class="headerlink" title="单个路由独享守卫"></a>单个路由独享守卫</h2><h3 id="beforeEnter"><a href="#beforeEnter" class="headerlink" title="beforeEnter"></a>beforeEnter</h3><p>在路由配置里面单独配置的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> router = <span class="keyword">new</span> VueRouter(&#123;</span><br><span class="line">  <span class="attr">routes</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">path</span>: <span class="string">&#x27;/name&#x27;</span>,</span><br><span class="line">      <span class="attr">componet</span>: Name,</span><br><span class="line">      <span class="attr">beforeEnter</span>: <span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">&#x27;进入name时调用，在组件内调用的守卫之前&#x27;</span>)</span><br><span class="line">        next();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="组件内调用守卫"><a href="#组件内调用守卫" class="headerlink" title="组件内调用守卫"></a>组件内调用守卫</h2><h3 id="beforeRouteEnter"><a href="#beforeRouteEnter" class="headerlink" title="beforeRouteEnter"></a>beforeRouteEnter</h3><p>在渲染当前路由组件对应路由被<code>完全确认(confirm)</code>前调用。因为此时，组件实例还未被创建。所以拿不到this即组件实例。但可以通过next的回调函数拿到实例</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;comp&#x27;</span>,</span><br><span class="line">  beforeRouteEnter(to, <span class="keyword">from</span>, next) =&gt; &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;进了当前组件且在路由确认前调用&#x27;</span>)</span><br><span class="line">    next(<span class="function">(<span class="params">vm</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(vm)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line">  beforeRouteUpdate(to, <span class="keyword">from</span>, next) =&gt; &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;进了当前组件，或在当前组件打开子路由组件父组件仍存在，但内容已经不一样了，需要更新，会调用&#x27;</span>)</span><br><span class="line">    <span class="comment">// 如 home中打开A组件，/home -&gt; /home/A。 回到home组件，/home/A -&gt; /home</span></span><br><span class="line">    next();</span><br><span class="line">  &#125;,</span><br><span class="line">  beforeRouteLeave(to, <span class="keyword">from</span>, next) =&gt; &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">&#x27;离开当前路由组件对应的路由时调用&#x27;</span>)</span><br><span class="line">    next();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="导航完整的解析流程"><a href="#导航完整的解析流程" class="headerlink" title="导航完整的解析流程"></a>导航完整的解析流程</h2><p>导航触发，肯定是从一个路由地址跳往另一个。我们这里考虑这种情况<code>/home/A -&gt; /home/B</code>，涉及到所有守卫;</p>
+<ol>
+<li>触发A的<code>beforeRouteLeave</code></li>
+<li>触发全局的<code>beforeEach</code></li>
+<li>触发Home组件中的<code>beforeRouteUpdate</code></li>
+<li>触发B的独享路由守卫<code>beforeEnter</code></li>
+<li>解析异步组件</li>
+<li>触发B的组件级守卫<code>beforeRouteEnter</code></li>
+<li>触发全局的<code>beforeResolve</code></li>
+<li>导航确认</li>
+<li>触发全局的<code>afterEach</code></li>
+<li>触发DOM更新</li>
+<li>组件实例创建完成，调用<code>beforeRouterEnter</code>中传递给<code>next</code>的回调函数，回调函数可传vm，即实例对象。</li>
+</ol>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://690554125.github.io/2018/12/30/2018/life-circle-in-vue/" title="Vue的钩子" target="_blank" rel="external">https://690554125.github.io/2018/12/30/2018/life-circle-in-vue/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/c690554125" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/c690554125" target="_blank"><span class="text-dark">Tkgkn</span><small class="ml-1x">FrontEnd</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2018/12/30/2018/thread-process/" title="进程，线程"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

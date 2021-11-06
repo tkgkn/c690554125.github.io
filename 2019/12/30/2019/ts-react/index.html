@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>React 和 Redux 技术栈快速接入 TS 指南 | Tkgkn</title>
+  <meta name="description" content="TS 的基本知识这里不做过多的介绍，请自己参照入门文档：TS 入门文档。  推荐直接使用create-react-app直接生成支持 ts 的项目，然后进行 TS 代码测试，create-react-app myProject --typescript。或者直接使用 TS 官方提供的TS 在线测试。 常用 React 内建常用类型 建议先浏览一遍有印象   React.FC&lt;Props&amp;g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React 和 Redux 技术栈快速接入 TS 指南">
+<meta property="og:url" content="https://690554125.github.io/2019/12/30/2019/ts-react/index.html">
+<meta property="og:site_name" content="三角猫">
+<meta property="og:description" content="TS 的基本知识这里不做过多的介绍，请自己参照入门文档：TS 入门文档。  推荐直接使用create-react-app直接生成支持 ts 的项目，然后进行 TS 代码测试，create-react-app myProject --typescript。或者直接使用 TS 官方提供的TS 在线测试。 常用 React 内建常用类型 建议先浏览一遍有印象   React.FC&lt;Props&amp;g">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-06T07:32:14.482Z">
+<meta property="article:author" content="czm">
+<meta property="article:tag" content="Javascript React Vue">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://690554125.github.io/2019/12/30/2019/ts-react/index.html">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="三角猫" type="application/atom+xml">
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/c690554125" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Tkgkn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">FrontEnd</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> 杭州</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      
+
+    
+      
+
+    
+      
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-2019/ts-react" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      React 和 Redux 技术栈快速接入 TS 指南
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/12/30/2019/ts-react/" class="article-date">
+	  <time datetime="2019-12-29T16:00:00.000Z" itemprop="datePublished">2019-12-30</time>
+	</a>
+</span>
+        
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/12/30/2019/ts-react/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <blockquote>
+<p>TS 的基本知识这里不做过多的介绍，请自己参照入门文档：<a target="_blank" rel="noopener" href="https://ts.xcatliu.com/introduction/get-typescript">TS 入门文档</a>。</p>
+</blockquote>
+<p>推荐直接使用<em>create-react-app</em>直接生成支持 ts 的项目，然后进行 TS 代码测试，<code>create-react-app myProject --typescript</code>。或者直接使用 TS 官方提供的<a href="http://www.typescriptlang.org/play/?esModuleInterop=true&target=6&jsx=2#code/JYOwLgpgTgZghgYwgAgCoHsAm7kG8BQyRyYwYANhAFzIDOYUoA5gNyHGYS0KMAOp6EDXqMQrfAF98+MAE9eKOMgC8yAApwopOOQA8GbAD4gA">TS 在线测试</a>。</p>
+<h2 id="常用-React-内建常用类型"><a href="#常用-React-内建常用类型" class="headerlink" title="常用 React 内建常用类型"></a>常用 React 内建常用类型</h2><blockquote>
+<p>建议先浏览一遍有印象</p>
+</blockquote>
+<ul>
+<li><p><code>React.FC&lt;Props&gt;</code>，定义函数组件用。</p>
+</li>
+<li><p><code>React.Component&lt;Props, State&gt;</code>，定义类组件用。</p>
+</li>
+<li><p><code>React.ReactNode</code>，用来定义各种 react 节点，比如<code>&lt;div /&gt;</code>, <code>&lt;MyComp /&gt;</code>, <code>this is a just a text</code>, <code>null</code>, <code>0</code>…</p>
+</li>
+<li><p><code>React.CSSProperties</code>，用来定义内联<code>style</code>的。</p>
+</li>
+<li><p><code>React.HTMLProps&lt;HTMLXXXELEMENT&gt;</code>，获取内建 html 元素的属性。</p>
+</li>
+<li></li>
+<li><p><code>React.PropsWithChildren</code>，如果需要显示使用 children，使用该类型创建 props，如：<code>React.PropsWithChildren&lt;&#123;a: string&#125;&gt;</code>。</p>
+</li>
+<li><p><code>React.ReactEventHandler&lt;HTMLXXXELEMENT&gt;</code>，用来描述元素的事件处理函数。可以自行推导出适合的事件函数描述。</p>
+</li>
+<li><p><code>React.ChangeEventHandler&lt;HTMLXXXELEMENT&gt;</code>，最常见的如 input 的 change 事件函数描述，人为的判定类型。区别于上面的，这里的 event 可用 event.target.value，上面的是 event.currentTarget.value。类似还有<code>MouseEventHandler</code>, <code>MouseEventHandler</code>等。</p>
+</li>
+</ul>
+<h2 id="常用的-TS-内建工具泛型和关键字"><a href="#常用的-TS-内建工具泛型和关键字" class="headerlink" title="常用的 TS 内建工具泛型和关键字"></a>常用的 TS 内建工具泛型和关键字</h2><blockquote>
+<p>建议先浏览一遍有印象</p>
+</blockquote>
+<ul>
+<li><p><code>typeof</code>关键字，自动推断出类型。如<code>typeof &#123;a: 1, b: &#39;hello&#39;&#125;</code> 得到 {a: number, b: string}。</p>
+</li>
+<li><p><code>keyof</code>关键字，类似于<code>Object.keys</code>。<code>keyof &#123;a: string, b: string&#125;</code>得到<code>&#39;a&#39; | &#39;b&#39;</code>。</p>
+</li>
+<li><p><code>in</code>关键字，类似于<code>let k in obj</code>，遍历。<code>type Keys = &#39;a&#39; | &#39;b&#39;, type Obj = &#123;[p in Keys]: any&#125;</code>，遍历了 Keys，p 相当于 k，得到的 Obj = {a: any, b: any}。</p>
+</li>
+<li><p><code>Partial&lt;T&gt;</code>，将 T 类型全部变为可选。如<code>Partial&lt;&#123;a: stirng, b: number&#125;&gt;</code> 得到 <code>&#123;a: string | undefined, b: number | undefined&#125;</code>。</p>
+</li>
+<li><p><code>Omit&lt;P, K&gt;</code>，从 P 中排除 K，返回排除后的结果。如<code>Omit&lt;&#123;a: string, b: number&#125;, &#39;a&#39;&gt;</code> 得到 <code>&#123;b: number&#125;</code>。</p>
+</li>
+<li><p><code>Pick&lt;T, K&gt;</code>，从 T 中挑选出 K。如<code>Pick&lt;&#123;a: 1, b: 2, c: 3&#125;, &#39;a&#39; | &#39;b&#39;</code> 得到<code>&#123;a: 1, b: 2&#125;</code>。（这里类型值写的是 number 类型的数字，TS 会推断出 number 类型）。</p>
+</li>
+<li><p><code>Exclude&lt;T, U&gt;</code>，从类型 T 中排除不在类型 U 中的。如<code>Exclude&lt;&#39;a&#39; | &#39;b&#39;, &#39;b&#39; | &#39;c&#39;&gt;</code> 得到 <code>&#39;a&#39;</code>，如<code>Exclude&lt;&#123;a: 1, b:2&#125;, &#123;a: 1, b:2, c: 3&#125;&gt;</code> 得到 <code>&#123;a: 1, b: 2&#125;</code>【这里可以这么理解：T 属于 U 的一种具体实现则返回 never，不是则返回 T】。自己实现<code>type Exc&lt;T, U&gt; = T extends U ? never: T</code>。</p>
+</li>
+<li><p><code>Extract&lt;T, U&gt;</code>，从类型 T 中提取出可以分配给类型 U 的部分。如<code>Extract&lt;&#39;a&#39; | &#39;b&#39;, &#39;b&#39; | &#39;c&#39;&gt;</code> 得到 <code>&#39;b&#39;</code>，如<code>Extract&lt;&#123;a: 1, b:2&#125;, &#123;a: 1, b:2, c: 3&#125;&gt;</code> 得到 <code>never</code>。【这里可以这么理解：T 属于 U 的一种具体实现，则返回 T，不是则返回 never】。自己实现<code>type Ext&lt;T, U&gt; = T extends U ? T : never</code>。</p>
+</li>
+</ul>
+<h2 id="非-React-技术栈的常见的-TS-用法"><a href="#非-React-技术栈的常见的-TS-用法" class="headerlink" title="非 React 技术栈的常见的 TS 用法"></a>非 React 技术栈的常见的 TS 用法</h2><h3 id="类型预测"><a href="#类型预测" class="headerlink" title="类型预测"></a>类型预测</h3><p><code>is</code>关键字。常用场景，明确一个对象的类型后，会调用该对象的属性或方法。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">do</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> str.length; <span class="comment">// 如果 str 是 number类型，就会报错。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这样写只能在编译阶段，当你传递的参数不是字符串类型而报错提示。</span></span><br><span class="line"><span class="comment">// 如果传入的参数是经过计算或者异步获取，无法保证时，运行时会很大概率报错。</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">do</span>(<span class="params">str: string</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> str.length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">do</span>(<span class="params">str: string</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> str === <span class="string">&#x27;string&#x27;</span>) &#123;</span><br><span class="line">    <span class="comment">// 做好类型判断后编译和运行时都不会报错。但是每次都判断的话，代码变多有点麻烦。</span></span><br><span class="line">    <span class="keyword">return</span> str.length;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通常会封装一个判断函数</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 一个判断函数</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isString</span>(<span class="params">val</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">typeof</span> val === <span class="string">&#x27;string&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">do</span>(<span class="params">str: string</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 调用判断函数</span></span><br><span class="line">  <span class="keyword">if</span> (isString(str)) &#123;</span><br><span class="line">    <span class="keyword">return</span> str.length;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果do函数的入参无法确认类型。我们通常会用any。</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">do</span>(<span class="params">str: any</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 这里TS已经忽略了入参类型。</span></span><br><span class="line">  <span class="keyword">if</span> (isString(str)) &#123;</span><br><span class="line">    <span class="keyword">return</span> str.length; <span class="comment">// 如果无length属性也不会在编译阶段报错，这跟我们使用TS的愿景不一致。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用类型预测 str is string。</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isString</span>(<span class="params">str: any</span>): <span class="title">str</span> <span class="title">is</span> <span class="title">string</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">typeof</span> val === <span class="string">&#x27;string&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">do</span>(<span class="params">val: any</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(isString(val)) &#123; <span class="comment">// 这里在运行时阶段也会判断是否是是string，再决定进入if内的执行代码。</span></span><br><span class="line">    <span class="keyword">return</span> str.length <span class="comment">// 这里在编译阶段（书写时）会获得string类型对象的所有属性和方法提示。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>str is string 能否改为: boolean，即 isString 返回的是一个布尔值？不能。改成单一的布尔类型后，无法获得期望的 string 类型对象的属性和方法推断。</p>
+</blockquote>
+<h2 id="React-常见写法"><a href="#React-常见写法" class="headerlink" title="React 常见写法"></a>React 常见写法</h2><h3 id="函数组件写法"><a href="#函数组件写法" class="headerlink" title="函数组件写法"></a>函数组件写法</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> FcComp: React.FC&lt;&#123; <span class="attr">prop1</span>: string &#125;&gt; = <span class="function">(<span class="params">&#123; prop1 &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span>&#123;prop1&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="类组件写法"><a href="#类组件写法" class="headerlink" title="类组件写法"></a>类组件写法</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">interface IProps &#123;</span><br><span class="line">  <span class="attr">name</span>: string;</span><br><span class="line">&#125;</span><br><span class="line">interface IState &#123;</span><br><span class="line">  <span class="attr">age</span>: number;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClsComp</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">IProps</span>, <span class="title">IState</span>&gt; </span>&#123;</span><br><span class="line">  state = &#123;</span><br><span class="line">    <span class="attr">age</span>: <span class="number">18</span>,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="默认参数写法"><a href="#默认参数写法" class="headerlink" title="默认参数写法"></a>默认参数写法</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">interface IProps <span class="keyword">extends</span> IDefaultProps &#123;</span><br><span class="line">  <span class="attr">name</span>: string;</span><br><span class="line">&#125;</span><br><span class="line">type IDefaultProps = <span class="keyword">typeof</span> DefComp.defaultProps; <span class="comment">// 获取到默认属性的type签名</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DefComp</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">IProps</span>, <span class="title">State</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> defaultProps = &#123;</span><br><span class="line">    <span class="attr">work</span>: <span class="string">&#x27;docter&#x27;</span>,</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">        &#123;this.props.name&#125; is &#123;this.props.work&#125;</span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>其他写法参照项目中<em>defaultProps</em>文件夹</p>
+</blockquote>
+<h3 id="通用组件写法"><a href="#通用组件写法" class="headerlink" title="通用组件写法"></a>通用组件写法</h3><p>这里描述一个最常见的情景，一个列表组件。利用泛型（阅读入门 TS 泛型部分）实现。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 组件定义</span></span><br><span class="line">interface IProps&lt;T&gt; &#123;</span><br><span class="line">  <span class="attr">lists</span>: T[]</span><br><span class="line">  <span class="attr">renderItem</span>: <span class="function">(<span class="params">item: T</span>) =&gt;</span> React.ReactNode <span class="comment">// 最好都用ReactNode，而不是JSX.Element。</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">List</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">IProps</span>&lt;<span class="title">T</span>&gt;, </span>&#123;&#125;&gt; &#123;</span><br><span class="line">  <span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123;lists, renderItem&#125; = <span class="built_in">this</span>.props</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="xml"><span class="tag">&lt;&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">ul</span>&gt;</span>&#123;lists.map(renderItem)&#125;<span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/&gt;</span></span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用组件。注意：这里List传入了一个类型number，限制了泛型T的类型。</span></span><br><span class="line">&lt;List&lt;number&gt; lists=&#123;[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]&#125; renderItem=&#123;<span class="function"><span class="params">item</span> =&gt;</span> <span class="xml"><span class="tag">&lt;<span class="name">li</span> <span class="attr">key</span>=<span class="string">&#123;item&#125;</span>&gt;</span>&#123;item&#125;<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span>&#125;/&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="高阶组件（HOC）写法"><a href="#高阶组件（HOC）写法" class="headerlink" title="高阶组件（HOC）写法"></a>高阶组件（HOC）写法</h3><blockquote>
+<p>React 的高阶组件即一个函数，接受一个组件，返回一个新的组件。</p>
+</blockquote>
+<p>这里写一个例子，一个 withState 函数，接收一个没有 count 状态的组件，包装后，返回一个带有 count 状态的组件。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* withState.tsx */</span></span><br><span class="line"><span class="keyword">export</span> interface InjectedProps &#123;</span><br><span class="line">  <span class="attr">count</span>: number,</span><br><span class="line">  <span class="attr">onIncrement</span>: <span class="function">() =&gt;</span> <span class="keyword">void</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> withState = &lt;P extends InjectedProps&gt;(WrappedComp: React.ComponentType&lt;P&gt;) =&gt; &#123;</span><br><span class="line">  // 使用Omit结合keyof，实现排除掉IProp和InjectedProps交集的部分(count, onIncrement)</span><br><span class="line">  type HocProps = Omit&lt;IProp, keyof InjectedProps&gt; &amp; &#123;</span><br><span class="line">    // 这里可以做HOC的Props的扩展。</span><br><span class="line">    initialCount?: number</span><br><span class="line">  &#125;</span><br><span class="line">  type HocState = &#123; readonly count: number &#125;</span><br><span class="line"></span><br><span class="line">  return class Hoc extends React.Component&lt;HocProps, HocState&gt; &#123;</span><br><span class="line">    // 组件的名字，方便调试</span><br><span class="line">    static displayName = `withState($&#123;WrappedComp.name&#125;)`</span><br><span class="line"></span><br><span class="line">    state: HocState = &#123;</span><br><span class="line">      count: Number(this.props.initialCount) || 0</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    handleInc = () =&gt; &#123;</span><br><span class="line">      this.setState(&#123;</span><br><span class="line">        count: this.state.count + 1</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    render() &#123;</span><br><span class="line">      const &#123; ...restProps &#125; = this.props</span><br><span class="line">      const &#123; count &#125; = this.state</span><br><span class="line">      return (</span><br><span class="line">        &lt;WrappedComp</span><br><span class="line">          count=&#123;count&#125;</span><br><span class="line">          onIncrement=&#123;this.handleInc&#125;</span><br><span class="line">          // HOC组件，应该透传与HOC无关的Prop给被包裹的组件。这里的写法是因为TS本身的BUG，如果不断言，则类型报错。</span><br><span class="line">          &#123;...(restProps as IProp)&#125;</span><br><span class="line">        &gt;&lt;/WrappedComp&gt;</span><br><span class="line">      )</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* FcCounter.tsx */</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> FcCounter: React.FC&lt;Props&gt; = <span class="function">(<span class="params">props</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; label, count, onIncrement &#125; = props;</span><br><span class="line">  <span class="keyword">const</span> handleIncrement = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    onIncrement();</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="xml">        &#123;label&#125;:&#123;count&#125;</span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">span</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">button</span> <span class="attr">type</span>=<span class="string">&quot;button&quot;</span> <span class="attr">onClick</span>=<span class="string">&#123;handleIncrement&#125;</span>&gt;</span>&#123;`Increment`&#125;<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 调用组件 */</span></span><br><span class="line"><span class="keyword">import</span> &#123; FcCounter &#125; <span class="keyword">from</span> <span class="string">&#x27;./FcCounter&#x27;</span></span><br><span class="line"><span class="keyword">import</span> &#123; withState &#125; <span class="keyword">from</span> <span class="string">&#x27;./withState&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> HocCounterWithState = withState(FcCounter)</span><br><span class="line"></span><br><span class="line">&lt;HocCounterWithState initialCount=&#123;<span class="number">10</span>&#125; label=<span class="string">&quot;HocCounterWithState&quot;</span> /&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="默认-props-的写法"><a href="#默认-props-的写法" class="headerlink" title="默认 props 的写法"></a>默认 props 的写法</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 类组件写法</span></span><br><span class="line">interface IProps <span class="keyword">extends</span> defaultProps &#123;</span><br><span class="line">  <span class="attr">age</span>: number;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 使用typeof获取到类组件的默认参数类型</span></span><br><span class="line">type defaultProps = <span class="keyword">typeof</span> DefaultPropsComp.defaultProps;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DefaultPropsComp</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">IProps</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> defaultProps = &#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;jack&#x27;</span>,</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  echoProps = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 这里也可以获得TS提示</span></span><br><span class="line">    <span class="keyword">const</span> &#123; age, name &#125; = <span class="built_in">this</span>.props;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">p</span>&gt;</span>this is how to set default props of class component<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数组件写法</span></span><br><span class="line"><span class="keyword">const</span> defaultProps = &#123;</span><br><span class="line">  <span class="attr">work</span>: <span class="string">&#x27;doctor&#x27;</span>,</span><br><span class="line">&#125;;</span><br><span class="line">interface IProps <span class="keyword">extends</span> defaultPropsType &#123;</span><br><span class="line">  <span class="attr">age</span>: number;</span><br><span class="line">&#125;</span><br><span class="line">type defaultPropsType = <span class="keyword">typeof</span> defaultProps;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">DefaultPropsFC</span>(<span class="params">props: IProps</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 这里可以获得提示</span></span><br><span class="line">  <span class="keyword">const</span> &#123; work, age &#125; = props;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">p</span>&gt;</span>&#123;`The $&#123;work&#125; is $&#123;age&#125;`&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注意：一定要挂载默认属性，否则调用组件的地方默认值也需要传入</span></span><br><span class="line">DefaultPropsFC.defaultProps = defaultProps;</span><br></pre></td></tr></table></figure>
+
+<h3 id="断言"><a href="#断言" class="headerlink" title="断言"></a>断言</h3><p>简单理解为可以 100%确定是什么类型，让 TS 按照确定的类型来进行 TS 提示，推断等。</p>
+<p>JSX 中只支持用 <code>as</code> 断言写法。不支持**&lt;&gt;**写法，如<code>var a = &lt;string&gt;b</code>。跟 jsx 冲突，会当成标签。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">type UserA = &#123;</span><br><span class="line">  <span class="attr">name</span>: string,</span><br><span class="line">  <span class="attr">age</span>: number</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type UserB = &#123;</span><br><span class="line">  <span class="attr">name</span>: string,</span><br><span class="line">  <span class="attr">sex</span>: string</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type IProps = &#123;</span><br><span class="line">  <span class="attr">user</span>: UserA | UserB</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AssertComp</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">IProps</span>, </span>&#123;&#125;&gt; &#123;</span><br><span class="line">  <span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 这里如果不做类型断言，会提示UserA上没有sex属性</span></span><br><span class="line">    <span class="comment">// const user = this.props.user</span></span><br><span class="line">    <span class="keyword">const</span> userB = <span class="built_in">this</span>.props.user <span class="keyword">as</span> UserB</span><br><span class="line">    <span class="keyword">const</span> userA = <span class="built_in">this</span>.props.user <span class="keyword">as</span> UserA</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>this is a user: &#123;userA.age&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>this is a user: &#123;userB.sex&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="xml">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="Context-写法"><a href="#Context-写法" class="headerlink" title="Context 写法"></a>Context 写法</h3><p>用 React 官方 DOC 里的更改按钮颜色主题做例子。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* ctx.tsx */</span></span><br><span class="line"><span class="keyword">export</span> type Theme = React.CSSProperties</span><br><span class="line"></span><br><span class="line">type Themes = &#123;</span><br><span class="line">  <span class="attr">dark</span>: Theme</span><br><span class="line">  <span class="attr">light</span>: Theme</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> themes: Themes = &#123;</span><br><span class="line">  <span class="attr">dark</span>: &#123;</span><br><span class="line">    <span class="attr">color</span>: <span class="string">&#x27;black&#x27;</span>,</span><br><span class="line">    <span class="attr">backgroundColor</span>: <span class="string">&#x27;white&#x27;</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">light</span>: &#123;</span><br><span class="line">    <span class="attr">color</span>: <span class="string">&#x27;white&#x27;</span>,</span><br><span class="line">    <span class="attr">backgroundColor</span>: <span class="string">&#x27;black&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里定义Context的签名</span></span><br><span class="line"><span class="keyword">export</span> type ThemeContextProps = &#123; <span class="attr">theme</span>: Theme; toggleTheme?: <span class="function">() =&gt;</span> <span class="keyword">void</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// createContext&lt;T&gt;需要一个类型，把定义好的Context签名传递进去</span></span><br><span class="line"><span class="keyword">const</span> ThemeContext = React.createContext&lt;ThemeContextProps&gt;(&#123;</span><br><span class="line">  <span class="attr">theme</span>: themes.light</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* themeButton.tsx */</span></span><br><span class="line"><span class="keyword">import</span> ThemeContext <span class="keyword">from</span> <span class="string">&#x27;./ctx&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// contextType v16.6+支持</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">ToggleThemeButton</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;</span>&#123;&#125;&gt; &#123;</span><br><span class="line">  <span class="keyword">static</span> contextType = ThemeContext</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 后面需要通过this.context访问到上下文，所以定义一个类属性</span></span><br><span class="line">  <span class="comment">// 这里使用!明确告诉TS，该参数一定有。</span></span><br><span class="line">  <span class="comment">// 这里不能使用？，因为context是必选项</span></span><br><span class="line">  context!: React.ContextType&lt;<span class="keyword">typeof</span> ThemeContext&gt;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 前面context必须这么写，这里才能获取TS提示</span></span><br><span class="line">    <span class="keyword">const</span> &#123; theme, toggleTheme &#125; = <span class="built_in">this</span>.context</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="xml"><span class="tag">&lt;<span class="name">button</span> <span class="attr">style</span>=<span class="string">&#123;theme&#125;</span> <span class="attr">onClick</span>=<span class="string">&#123;toggleTheme&#125;</span> &#123;<span class="attr">...this.props</span>&#125;&gt;</span></span></span><br><span class="line"><span class="xml">        button</span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* provider组件 */</span></span><br><span class="line"><span class="keyword">import</span> ThemeContext, &#123; Theme, themes &#125; <span class="keyword">from</span> <span class="string">&#x27;./ctx&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> ThemeButton <span class="keyword">from</span> <span class="string">&#x27;./themeButton&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">ThemeProvider</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;</span>&#123;&#125;, State&gt; &#123;</span><br><span class="line">  <span class="attr">state</span>: State = &#123;</span><br><span class="line">    <span class="attr">theme</span>: themes.light,</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  toggleTheme = <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.setState(<span class="function">(<span class="params">state</span>) =&gt;</span> (&#123;</span><br><span class="line">      <span class="attr">theme</span>: state.theme === themes.light ? themes.dark : themes.light,</span><br><span class="line">    &#125;));</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; theme &#125; = <span class="built_in">this</span>.state;</span><br><span class="line">    <span class="keyword">const</span> &#123; toggleTheme &#125; = <span class="built_in">this</span>;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="xml"><span class="tag">&lt;<span class="name">ThemeContext.Provider</span> <span class="attr">value</span>=<span class="string">&#123;&#123;</span> <span class="attr">theme</span>, <span class="attr">toggleTheme</span> &#125;&#125;&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">ThemeButton</span> /&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">ThemeContext.Provider</span>&gt;</span></span></span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="多类型参数（重载）"><a href="#多类型参数（重载）" class="headerlink" title="多类型参数（重载）"></a>多类型参数（重载）</h3><p>假设组件接收 2 种类型的 props。可以传<code>&#123;a: string, config?: number&#125;</code>，或者<code>&#123;b: string&#125;</code>。传递 config 时，说明是用的第一种类型 Props，也一定需要传递 a.</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义types</span></span><br><span class="line">type CommonProps = &#123;</span><br><span class="line">  <span class="attr">children</span>: React.ReactNode</span><br><span class="line">  <span class="attr">as</span>: <span class="string">&#x27;p&#x27;</span> | <span class="string">&#x27;span&#x27;</span> | <span class="string">&#x27;h1&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type NoTrucateProps = CommonProps &amp; &#123;</span><br><span class="line">  truncate?: <span class="literal">false</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type TrucateProps = CommonProps &amp; &#123;</span><br><span class="line">  <span class="attr">truncate</span>: <span class="literal">true</span></span><br><span class="line">  expanded?: boolean</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义一个类型判断，运行时可用，这里使用了is技巧。</span></span><br><span class="line"><span class="keyword">const</span> isTrucateProps = (</span><br><span class="line">  props: TrucateProps | NoTrucateProps</span><br><span class="line">): props is TrucateProps =&gt; &#123;</span><br><span class="line">  <span class="keyword">return</span> !!props.truncate</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里是关键，函数重载，约定入参和反参。（并不是具体代码实现）调用组件的地方即可获取正确提示。</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Text</span>(<span class="params">props: NoTrucateProps</span>): <span class="title">JSX</span>.<span class="title">Element</span></span></span><br><span class="line"><span class="function"><span class="function"><span class="keyword">function</span> <span class="title">Text</span>(<span class="params">props: TrucateProps</span>): <span class="title">JSX</span>.<span class="title">Element</span></span></span></span><br><span class="line"><span class="function"><span class="function">// 这里才是<span class="title">Text</span>函数的真正实现。</span></span></span><br><span class="line"><span class="function"><span class="function"><span class="function"><span class="keyword">function</span> <span class="title">Text</span>(<span class="params">props: NoTrucateProps | TrucateProps</span>) </span>&#123;</span></span></span><br><span class="line"><span class="function"><span class="function">  <span class="title">console</span>.<span class="title">log</span>(<span class="params">props</span>)</span></span></span><br><span class="line"><span class="function"><span class="function">  <span class="title">if</span> (<span class="params">isTrucateProps(props)</span>) </span>&#123;</span></span><br><span class="line"><span class="function">    <span class="title">const</span> </span>&#123; children, <span class="attr">as</span>: Tag, truncate, expanded, ...others &#125; = props</span><br><span class="line">    <span class="keyword">const</span> classNames = truncate ? <span class="string">&#x27;.truncate&#x27;</span> : <span class="string">&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="xml"><span class="tag">&lt;<span class="name">Tag</span> <span class="attr">className</span>=<span class="string">&#123;classNames&#125;</span> <span class="attr">aria-expanded</span>=<span class="string">&#123;!!expanded&#125;</span> &#123;<span class="attr">...others</span>&#125;&gt;</span></span></span><br><span class="line"><span class="xml">        &#123;children&#125;</span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">Tag</span>&gt;</span></span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> &#123; children, <span class="attr">as</span>: Tag, ...others &#125; = props</span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">Tag</span> &#123;<span class="attr">...others</span>&#125;&gt;</span>&#123;children&#125;<span class="tag">&lt;/<span class="name">Tag</span>&gt;</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Text.defaultProps = &#123;</span><br><span class="line">  <span class="attr">as</span>: <span class="string">&#x27;p&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用地</span></span><br><span class="line"><span class="comment">// 这里传递了expanded，但未传入truncate，会获得提示。^_^</span></span><br><span class="line">&lt;OptionalProps expanded&gt;truncate-able but expanded&lt;/OptionalProps&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="零碎，但频率高的-React-用法"><a href="#零碎，但频率高的-React-用法" class="headerlink" title="零碎，但频率高的 React 用法"></a>零碎，但频率高的 React 用法</h3><p>包括：<strong>style 样式定义</strong>，<strong>接收 React 节点定义</strong>，<strong>事件函数定义</strong>，<strong>固定可选参数配置</strong>，<strong>类属性定义</strong>，<strong>Ref 定义</strong>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* usefulReactProp.tsx */</span></span><br><span class="line">interface IProps <span class="keyword">extends</span> DefaultProps &#123;</span><br><span class="line">  <span class="attr">descText</span>: string <span class="comment">// 基本的类型</span></span><br><span class="line">  style?: React.CSSProperties <span class="comment">// 可以在调用组件的地方，获得style的完美提示。</span></span><br><span class="line">  additionDom?: React.ReactNode <span class="comment">// 接收任何类型的React节点</span></span><br><span class="line">  renderReactNode?: <span class="function">() =&gt;</span> React.ReactNode <span class="comment">// 接收一个以函数方式返回的React节点</span></span><br><span class="line">  <span class="attr">onChange</span>: React.FormEventHandler&lt;HTMLInputElement&gt; <span class="comment">// 优先推荐这种写法，让TS自己推断。下面的方法定义同样可以。</span></span><br><span class="line">  <span class="comment">// onChange: (event: React.ChangeEvent&lt;HTMLInputElement&gt;) =&gt; void</span></span><br><span class="line">  buttonSize: <span class="string">&#x27;small&#x27;</span> | <span class="string">&#x27;middle&#x27;</span> | <span class="string">&#x27;big&#x27;</span> <span class="comment">// 可选参数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type DefaultProps = <span class="keyword">typeof</span> UsefulReactProp.defaultProps</span><br><span class="line">interface IState &#123;</span><br><span class="line">  <span class="attr">value</span>: string</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">UsefulReactProp</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span>&lt;<span class="title">IProps</span>, <span class="title">IState</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> defaultProps = &#123;</span><br><span class="line">    <span class="attr">initVal</span>: <span class="string">&#x27;输入内容&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 定义一个dom引用。使用如下定义方式</span></span><br><span class="line">  <span class="keyword">static</span> aDom = React.createRef&lt;HTMLDivElement&gt;()</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 定义一个类属性，可以在需要时在赋值使用</span></span><br><span class="line">  <span class="keyword">static</span> classProp?: string</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 定义一个类属性，在定义时即复制</span></span><br><span class="line">  <span class="keyword">static</span> classProp2 = <span class="string">&#x27;hello&#x27;</span></span><br><span class="line"></span><br><span class="line">  state = &#123;</span><br><span class="line">    <span class="attr">value</span>: <span class="built_in">this</span>.props.initVal</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  defaultOnChange = <span class="function">(<span class="params">e: React.ChangeEvent&lt;HTMLInputElement&gt;</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; onChange &#125; = <span class="built_in">this</span>.props</span><br><span class="line">    <span class="built_in">this</span>.setState(&#123;</span><br><span class="line">      <span class="attr">value</span>: e.target.value</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="built_in">this</span>.classProp = <span class="string">&#x27;hello world&#x27;</span></span><br><span class="line">    onChange(e)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="title">render</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; onChange, style, additionDom, renderReactNode &#125; = <span class="built_in">this</span>.props</span><br><span class="line">    <span class="keyword">const</span> &#123; value &#125; = <span class="built_in">this</span>.state</span><br><span class="line">    <span class="comment">// 如下代码提示只有3种上述定义过的值。</span></span><br><span class="line">    <span class="keyword">const</span> btnSize =</span><br><span class="line">      <span class="built_in">this</span>.props.buttonSize === <span class="string">&#x27;big&#x27;</span></span><br><span class="line">        ? <span class="string">&#x27;100px&#x27;</span></span><br><span class="line">        : <span class="built_in">this</span>.props.buttonSize === <span class="string">&#x27;small&#x27;</span></span><br><span class="line">        ? <span class="string">&#x27;60px&#x27;</span></span><br><span class="line">        : <span class="string">&#x27;80px;&#x27;</span></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">value</span>=<span class="string">&#123;value&#125;</span> <span class="attr">onChange</span>=<span class="string">&#123;this.defaultOnChange&#125;</span> /&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">p</span> <span class="attr">className</span>=<span class="string">&quot;desc&quot;</span> <span class="attr">style</span>=<span class="string">&#123;style&#125;</span>&gt;</span></span></span><br><span class="line"><span class="xml">          这是个带样式的提醒</span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;/<span class="name">p</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;additional&quot;</span>&gt;</span>&#123;additionDom&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">className</span>=<span class="string">&quot;by-func-rcnode&quot;</span>&gt;</span></span></span><br><span class="line"><span class="xml">          &#123;renderReactNode ? renderReactNode() : null&#125;</span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line"><span class="xml">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">width:</span> <span class="attr">btnSize</span> &#125;&#125;&gt;</span>按钮尺寸：联合类型提示<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 调用 */</span></span><br><span class="line"><span class="comment">// 如下都可以获取类型提示。</span></span><br><span class="line">&lt;UsefulReactProp</span><br><span class="line">  descText=<span class="string">&quot;一个简单的描述&quot;</span></span><br><span class="line">  onChange=&#123;<span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(e.currentTarget.value);</span><br><span class="line">  &#125;&#125;</span><br><span class="line">  style=&#123;&#123; <span class="attr">fontSize</span>: <span class="number">14</span>, <span class="attr">fontWeight</span>: <span class="string">&#x27;bold&#x27;</span> &#125;&#125;</span><br><span class="line">  additionDom=&#123;<span class="xml"><span class="tag">&lt;<span class="name">p</span>&gt;</span>this is additional tag<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span>&#125;</span><br><span class="line">  renderReactNode=&#123;<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">p</span>&gt;</span>这是通过函数返回的ReactNode<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span>;</span><br><span class="line">  &#125;&#125;</span><br><span class="line">  buttonSize=<span class="string">&quot;big&quot;</span></span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://690554125.github.io/2019/12/30/2019/ts-react/" title="React 和 Redux 技术栈快速接入 TS 指南" target="_blank" rel="external">https://690554125.github.io/2019/12/30/2019/ts-react/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/c690554125" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/c690554125" target="_blank"><span class="text-dark">Tkgkn</span><small class="ml-1x">FrontEnd</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/12/30/2019/webpack-inject-plugins/" title="webpack 的各种注入插件"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/12/30/2019/react-purecompent-diff/" title="React PureComponent 的浅比较"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

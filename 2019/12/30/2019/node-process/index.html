@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>node 查询和关闭进程 | Tkgkn</title>
+  <meta name="description" content="手头的 electron 项目，需要查询并关闭另外的程序，程序本身虽然是通过子进程方式启动，但是启动的仅是个壳，壳本身又自己启动了另一个程序 Z，导致无法通过子进程启动后的句柄拿到真正启动的程序 Z。所以无法监控到程序 Z 目前是开启还是关闭的。 解决方法就是 node 子进程模块的 spawn  去执行 windows 的 cmd 命令。该项目只在 windows 电脑运行，所以要用 windo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="node 查询和关闭进程">
+<meta property="og:url" content="https://690554125.github.io/2019/12/30/2019/node-process/index.html">
+<meta property="og:site_name" content="三角猫">
+<meta property="og:description" content="手头的 electron 项目，需要查询并关闭另外的程序，程序本身虽然是通过子进程方式启动，但是启动的仅是个壳，壳本身又自己启动了另一个程序 Z，导致无法通过子进程启动后的句柄拿到真正启动的程序 Z。所以无法监控到程序 Z 目前是开启还是关闭的。 解决方法就是 node 子进程模块的 spawn  去执行 windows 的 cmd 命令。该项目只在 windows 电脑运行，所以要用 windo">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-06T07:31:26.651Z">
+<meta property="article:author" content="czm">
+<meta property="article:tag" content="Javascript React Vue">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://690554125.github.io/2019/12/30/2019/node-process/index.html">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 5.4.0"><link rel="alternate" href="/atom.xml" title="三角猫" type="application/atom+xml">
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/c690554125" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Tkgkn</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">FrontEnd</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> 杭州</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      
+
+    
+      
+
+    
+      
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-2019/node-process" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      node 查询和关闭进程
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/12/30/2019/node-process/" class="article-date">
+	  <time datetime="2019-12-29T16:00:00.000Z" itemprop="datePublished">2019-12-30</time>
+	</a>
+</span>
+        
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/12/30/2019/node-process/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>手头的 electron 项目，需要查询并关闭另外的程序，程序本身虽然是通过子进程方式启动，但是启动的仅是个壳，壳本身又自己启动了另一个程序 Z，导致无法通过子进程启动后的句柄拿到真正启动的程序 Z。所以无法监控到程序 Z 目前是开启还是关闭的。</p>
+<p>解决方法就是 node 子进程模块的 <code>spawn</code>  去执行 windows 的 cmd 命令。该项目只在 windows 电脑运行，所以要用 windows 的命令行而非 liunx 命令。</p>
+<blockquote>
+<p>这里项目本身只在 windows 运行，所以执行的命令应该是 windows 下的，而不是 linux 命令。比如列出当前目录文件，windows 下用的是 <code>dir</code> ，而 linux 下用的是 <code>ls</code> 。两者是不同的，因为我的电脑安装了 <code>cmder</code> ，即可以调用 windows 命令也可以调用 linux 命令。win10 的话有 powershell，可能能支持 linux 命令</p>
+</blockquote>
+<p>直接在 cmd 里面运行查找进程的命令的话，是这样的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tasklist | findstr /i chrome.exe</span><br><span class="line"><span class="comment">// tasklist 查找系统进程后，查找的内容通过管道符 | 传递给另一个命令 findstr ，这个命令接收参数，这里接受了忽略大小写，然后查找chrome.exe关键字，并返回结果。</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>/i</code>  意味忽略大小写。</p>
+<blockquote>
+<p>另外要注意的是，查找进程名字如果很长的话，通过上面的命令，查找出来的进程名字会被截取，限制了 25 个字符好像。所以可以加另一个参数给 tasklist， <code>/fo csv</code>  以该模式输出，避免查找出的结果被截取。这样查找后的结果，是自带””的，如： <code>&quot;YoudaoDict.exe&quot;,&quot;5324&quot;,&quot;Console&quot;,&quot;1&quot;,&quot;37,028 K&quot;</code></p>
+</blockquote>
+<p>开始说正题，node 的子进程模块提供了 <code>exec</code>  和 <code>spawn</code> 2 种方式来调用，其中 <code>exec</code>  会起一个 shell 来执行传入的参数，而 <code>spawn</code>  不会起 shell。所以两种方法调用是有区别的。</p>
+<p><a name="U2KVo"></a></p>
+<h5 id="exec-方式"><a href="#exec-方式" class="headerlink" title="exec 方式"></a>exec 方式</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">exec(<span class="string">`tasklist /fo csv | findstr /i YouDaoDict.exe`</span>, <span class="function">(<span class="params">err, stdout, stderr</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`tasklist error: <span class="subst">$&#123;err&#125;</span>`</span>);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`stdout <span class="subst">$&#123;stdout&#125;</span>`</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`stderr <span class="subst">$&#123;stderr&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><a name="GAj2U"></a></p>
+<h5 id="spawn-方式"><a href="#spawn-方式" class="headerlink" title="spawn 方式"></a>spawn 方式</h5><p>相比上面的写法，略麻烦，注意 tasklist 和 findstr 是 2 个命令，正如上面解释的那样，是 tasklist 运行获取的值给到 findstr 在做的筛选。因此通过 spawn 的方式，需要这么写：</p>
+<p>这里涉及到了 <code>stdin stdout</code>  的使用，看起来像个流，简单理解下 <code>stdin</code>  就是函数的入参， <code>stdout</code>  就是函数的返回值。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; spawn &#125; = <span class="built_in">require</span>(<span class="string">&#x27;child_process&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> tasklist = spawn(<span class="string">&#x27;tasklist&#x27;</span>, [<span class="string">&#x27;/fo&#x27;</span>, <span class="string">&#x27;csv&#x27;</span>]);</span><br><span class="line"><span class="keyword">const</span> findstr = spawn(<span class="string">&#x27;findstr&#x27;</span>, [<span class="string">&#x27;/i&#x27;</span>, <span class="string">&#x27;AsmanVR-Win64-Shipping&#x27;</span>]);</span><br><span class="line"></span><br><span class="line">tasklist.stdout.on(<span class="string">&#x27;data&#x27;</span>, <span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 往findstr的输入中写入 tasklist的输出数据。</span></span><br><span class="line">  findstr.stdin.write(data);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">tasklist.stderr.on(<span class="string">&#x27;data&#x27;</span>, <span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.error(<span class="string">`tasklist stderr: <span class="subst">$&#123;data&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">tasklist.on(<span class="string">&#x27;close&#x27;</span>, <span class="function">(<span class="params">code</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (code !== <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`tasklist进程退出，退出码：<span class="subst">$&#123;code&#125;</span>`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  findstr.stdin.end();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">findstr.stdout.on(<span class="string">&#x27;data&#x27;</span>, <span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 监听findstr的输出（就是运行返回的结果）</span></span><br><span class="line">  <span class="built_in">console</span>.log(data.toString()); <span class="comment">// 这里就是真正获取到查询结果的地方。</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">findstr.stderr.on(<span class="string">&#x27;data&#x27;</span>, <span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">`findstr stderr: <span class="subst">$&#123;data&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">findstr.on(<span class="string">&#x27;close&#x27;</span>, <span class="function">(<span class="params">code</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (code !== <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">`findstr进程退出，退出码：<span class="subst">$&#123;code&#125;</span>`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://690554125.github.io/2019/12/30/2019/node-process/" title="node 查询和关闭进程" target="_blank" rel="external">https://690554125.github.io/2019/12/30/2019/node-process/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/c690554125" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/c690554125" target="_blank"><span class="text-dark">Tkgkn</span><small class="ml-1x">FrontEnd</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/12/30/2019/es-module/" title="webpack 模块化原理（ES 的）"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/12/30/2019/webpack-inject-plugins/" title="webpack 的各种注入插件"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/c690554125" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
