@@ -105,4 +105,3 @@ deploy:
   type: git
   repo: https://github.com/c690554125/c690554125.github.io
   branch: master
-  token: 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
